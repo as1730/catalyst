@@ -14,6 +14,8 @@ import '@/index.css'
 import { DashboardPage } from '@/pages/DashboardPage'
 import { SubjectsPage } from '@/pages/SubjectsPage'
 import { SessionsPage } from '@/pages/SessionsPage'
+import { GoalsPage } from '@/pages/GoalsPage'
+import { AnalyticsPage } from '@/pages/AnalyticsPage'
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -40,12 +42,12 @@ const router = createBrowserRouter([
   },
   {
     path: "/goals",
-    element: <DashboardPage />, // Placeholder for Phase 3
+    element: <GoalsPage />,
     errorElement: <RouteErrorBoundary />,
   },
   {
     path: "/analytics",
-    element: <DashboardPage />, // Placeholder for Phase 3
+    element: <AnalyticsPage />,
     errorElement: <RouteErrorBoundary />,
   }
 ]);

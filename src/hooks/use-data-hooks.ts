@@ -26,6 +26,16 @@ export function useDeleteSubject() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['subjects'] }),
   });
 }
+export function useUpdateSubject() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<Subject> }) => api<Subject>(`/api/subjects/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['subjects'] }),
+  });
+}
 export function useSessions() {
   return useQuery({
     queryKey: ['sessions'],
@@ -49,6 +59,18 @@ export function useUpdateSession() {
       method: 'PUT',
       body: JSON.stringify(data),
     }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sessions'] });
+      queryClient.invalidateQueries({ queryKey: ['goals'] }); // Sessions affect goal progress indirectly
+    },
+  });
+}
+export function useDeleteSession() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api<boolean>(`/api/sessions/${id}`, {
+      method: 'DELETE',
+    }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['sessions'] }),
   });
 }
@@ -56,5 +78,34 @@ export function useGoals() {
   return useQuery({
     queryKey: ['goals'],
     queryFn: () => api<{ items: Goal[] }>('/api/goals'),
+  });
+}
+export function useCreateGoal() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: Partial<Goal>) => api<Goal>('/api/goals', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['goals'] }),
+  });
+}
+export function useUpdateGoal() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<Goal> }) => api<Goal>(`/api/goals/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['goals'] }),
+  });
+}
+export function useDeleteGoal() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api<boolean>(`/api/goals/${id}`, {
+      method: 'DELETE',
+    }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['goals'] }),
   });
 }

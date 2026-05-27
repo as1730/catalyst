@@ -48,9 +48,33 @@ export function userRoutes(app: Hono<{ Bindings: Env }>) {
     const updated = await entity.mutate(s => ({ ...s, ...data }));
     return ok(c, updated);
   });
+  app.delete('/api/sessions/:id', async (c) => ok(c, await StudySessionEntity.delete(c.env, c.req.param('id'))));
   // GOALS
   app.get('/api/goals', async (c) => {
     await GoalEntity.ensureSeed(c.env);
     return ok(c, await GoalEntity.list(c.env));
   });
+  app.post('/api/goals', async (c) => {
+    const data = await c.req.json<Partial<Goal>>();
+    if (!isStr(data.title) || !data.targetDate) return bad(c, 'title and targetDate required');
+    const goal: Goal = {
+      id: crypto.randomUUID(),
+      title: data.title,
+      description: data.description || '',
+      targetDate: data.targetDate,
+      progress: data.progress ?? 0,
+      status: 'active',
+      relatedSubjects: data.relatedSubjects || []
+    };
+    return ok(c, await GoalEntity.create(c.env, goal));
+  });
+  app.put('/api/goals/:id', async (c) => {
+    const id = c.req.param('id');
+    const data = await c.req.json<Partial<Goal>>();
+    const entity = new GoalEntity(c.env, id);
+    if (!(await entity.exists())) return notFound(c);
+    const updated = await entity.mutate(s => ({ ...s, ...data }));
+    return ok(c, updated);
+  });
+  app.delete('/api/goals/:id', async (c) => ok(c, await GoalEntity.delete(c.env, c.req.param('id'))));
 }

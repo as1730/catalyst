@@ -1,5 +1,5 @@
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -14,14 +14,15 @@ const formSchema = z.object({
   startTime: z.string().min(1, "Start time is required"),
   durationMinutes: z.coerce.number().min(5, "Minimum 5 minutes"),
 });
+type SessionFormValues = z.infer<typeof formSchema>;
 export function SessionForm({ onSuccess }: { onSuccess: () => void }) {
   const { data: subjectsData } = useSubjects();
   const createSession = useCreateSession();
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<SessionFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: { title: "", subjectId: "", startTime: "", durationMinutes: 60 },
   });
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  const onSubmit: SubmitHandler<SessionFormValues> = async (values) => {
     try {
       const startTime = new Date(values.startTime).getTime();
       await createSession.mutateAsync({
@@ -35,7 +36,7 @@ export function SessionForm({ onSuccess }: { onSuccess: () => void }) {
     } catch (err) {
       toast.error("Failed to schedule session");
     }
-  }
+  };
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
