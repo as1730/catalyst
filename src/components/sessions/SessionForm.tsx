@@ -12,7 +12,7 @@ const formSchema = z.object({
   title: z.string().min(2, "Title is required"),
   subjectId: z.string().min(1, "Subject is required"),
   startTime: z.string().min(1, "Start time is required"),
-  durationMinutes: z.coerce.number().min(5, "Minimum 5 minutes"),
+  durationMinutes: z.number().min(5, "Minimum 5 minutes"),
 });
 type SessionFormValues = z.infer<typeof formSchema>;
 interface SessionFormProps {
@@ -102,7 +102,13 @@ export function SessionForm({ onSuccess }: SessionFormProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Focus Time (min)</FormLabel>
-                <FormControl><Input type="number" {...field} /></FormControl>
+                <FormControl>
+                  <Input 
+                    type="number" 
+                    {...field} 
+                    onChange={(e) => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}

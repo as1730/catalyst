@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BrainCircuit, BookOpen, Play, FileText, Sparkles, ChevronLeft, Lightbulb, ListChecks } from 'lucide-react';
+import { BrainCircuit, Play, FileText, Sparkles, ChevronLeft, Lightbulb, ListChecks } from 'lucide-react';
 import { useSubjects } from '@/hooks/use-data-hooks';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
-// Placeholder AI Logic
-const YOUR_API_KEY = "sk-ant-placeholder";
 export function SubjectDetailPage() {
   const { id } = useParams();
   const { data: subjects, isLoading } = useSubjects();
@@ -17,17 +15,20 @@ export function SubjectDetailPage() {
   const subject = subjects?.items?.find(s => s.id === id);
   const generateStudyPlan = async () => {
     setIsGenerating(true);
-    // Simulate AI Call
+    toast.info("Mentor AI: Analyzing materials...");
     setTimeout(() => {
-      setIsGenerating(false);
-      toast.success("AI Study Plan Generated!", {
-        description: "Your personalized roadmap is now ready.",
-        icon: <Sparkles className="h-5 w-5 text-app-warning" />
-      });
-    }, 2000);
+      toast.info("Mentor AI: Synthesizing roadmap...");
+      setTimeout(() => {
+        setIsGenerating(false);
+        toast.success("AI Study Plan Generated!", {
+          description: "Your personalized roadmap is now ready in the Plan tab.",
+          icon: <Sparkles className="h-5 w-5 text-app-warning" />
+        });
+      }, 1500);
+    }, 1500);
   };
-  if (isLoading) return <AppLayout container><Skeleton className="h-96 w-full" /></AppLayout>;
-  if (!subject) return <AppLayout container><div>Subject not found</div></AppLayout>;
+  if (isLoading) return <AppLayout container><Skeleton className="h-96 w-full rounded-3xl" /></AppLayout>;
+  if (!subject) return <AppLayout container><div className="text-center py-20">Subject not found</div></AppLayout>;
   return (
     <AppLayout container>
       <div className="space-y-8 animate-fade-in pb-20">
@@ -36,25 +37,27 @@ export function SubjectDetailPage() {
         </Link>
         <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="flex items-center gap-6">
-            <div className="h-20 w-20 rounded-[2rem] bg-primary/10 flex items-center justify-center text-4xl shadow-inner">
-              📚
+            <div className="h-20 w-20 rounded-[2rem] bg-primary/10 flex items-center justify-center text-4xl shadow-inner border border-primary/5">
+              {subject.emoji || '📚'}
             </div>
             <div>
-              <h1 className="text-4xl font-bold">{subject.name}</h1>
-              <p className="text-muted-foreground mt-1 max-w-lg">{subject.description || "Master this subject with AI-powered insights."}</p>
+              <h1 className="text-4xl font-bold tracking-tight">{subject.name}</h1>
+              <p className="text-muted-foreground mt-1 max-w-lg">
+                {subject.description || "Master this subject with AI-powered insights and focused study blocks."}
+              </p>
             </div>
           </div>
           <div className="flex gap-3">
-            <Button 
-              size="lg" 
-              className="rounded-2xl gap-2 font-bold bg-primary hover:bg-primary/90"
+            <Button
+              size="lg"
+              className="rounded-2xl gap-2 font-bold bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20"
               onClick={generateStudyPlan}
               disabled={isGenerating}
             >
               <Sparkles className={`h-5 w-5 ${isGenerating ? 'animate-spin' : ''}`} />
-              {isGenerating ? "Analyzing Content..." : "Generate AI Plan"}
+              {isGenerating ? "Processing..." : "Generate AI Plan"}
             </Button>
-            <Button variant="outline" size="lg" className="rounded-2xl gap-2 font-bold border-2">
+            <Button variant="outline" size="lg" className="rounded-2xl gap-2 font-bold border-2 hover:bg-secondary">
               <BrainCircuit className="h-5 w-5" /> Quick Quiz
             </Button>
           </div>
@@ -90,7 +93,7 @@ export function SubjectDetailPage() {
                 </div>
               </TabsContent>
               <TabsContent value="plan" className="pt-6">
-                <Card>
+                <Card className="bg-muted/30">
                   <CardContent className="p-8 text-center space-y-4">
                     <ListChecks className="h-12 w-12 mx-auto text-muted-foreground opacity-20" />
                     <p className="text-muted-foreground italic">Click "Generate AI Plan" to create your structured roadmap.</p>
@@ -108,7 +111,7 @@ export function SubjectDetailPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm leading-relaxed">
-                  Based on your recent sessions, you tend to struggle with <strong>Integration by Parts</strong>. Try a focused 25-minute Pomodoro session on this specific topic tonight.
+                  Based on your recent sessions, you tend to struggle with <strong>Complex Notations</strong>. Try a focused 25-minute Pomodoro session on this specific topic tonight.
                 </p>
               </CardContent>
             </Card>
@@ -121,17 +124,17 @@ export function SubjectDetailPage() {
                   <span className="text-sm font-medium">Confidence Level</span>
                   <div className="flex gap-1">
                     {[1, 2, 3, 4, 5].map(star => (
-                      <div key={star} className={`h-2 w-5 rounded-full ${star <= 3 ? 'bg-primary' : 'bg-muted'}`} />
+                      <div key={star} className={`h-2 w-5 rounded-full ${star <= (subject.confidence || 3) ? 'bg-primary' : 'bg-muted'}`} />
                     ))}
                   </div>
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs font-bold uppercase text-muted-foreground">
                     <span>XP Progression</span>
-                    <span>1,200 / 2,500</span>
+                    <span>{subject.xp || 0} / 2,500</span>
                   </div>
                   <div className="h-2 bg-secondary rounded-full overflow-hidden">
-                    <div className="h-full bg-primary" style={{ width: '48%' }} />
+                    <div className="h-full bg-primary" style={{ width: `${Math.min(100, ((subject.xp || 0) / 2500) * 100)}%` }} />
                   </div>
                 </div>
               </CardContent>

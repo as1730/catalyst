@@ -1,5 +1,5 @@
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -13,7 +13,7 @@ const formSchema = z.object({
   name: z.string().min(2, { message: "Subject name must be at least 2 characters." }),
   description: z.string().optional(),
   emoji: z.string().min(1, "Emoji required"),
-  confidence: z.coerce.number().min(1).max(5),
+  confidence: z.number().min(1).max(5),
   examDate: z.string().optional()
 });
 type SubjectFormValues = z.infer<typeof formSchema>;
@@ -32,11 +32,12 @@ export function SubjectForm({ onSuccess }: SubjectFormProps) {
       examDate: ""
     },
   });
-  async function onSubmit(values: SubjectFormValues) {
+  const onSubmit: SubmitHandler<SubjectFormValues> = async (values) => {
     try {
+      const { examDate, ...rest } = values;
       await createSubject.mutateAsync({
-        ...values,
-        examDate: values.examDate ? new Date(values.examDate).getTime() : undefined
+        ...rest,
+        examDate: examDate ? new Date(examDate).getTime() : undefined
       });
       toast.success("Subject added successfully!", {
         description: `${values.name} is now in your Knowledge Vault.`
@@ -45,7 +46,7 @@ export function SubjectForm({ onSuccess }: SubjectFormProps) {
     } catch (e) {
       toast.error("Failed to create subject");
     }
-  }
+  };
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-2">
@@ -93,7 +94,10 @@ export function SubjectForm({ onSuccess }: SubjectFormProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Confidence (1-5)</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={String(field.value)}>
+                <Select 
+                  onValueChange={(val) => field.onChange(Number(val))} 
+                  defaultValue={String(field.value)}
+                >
                   <FormControl>
                     <SelectTrigger><SelectValue placeholder="3" /></SelectTrigger>
                   </FormControl>

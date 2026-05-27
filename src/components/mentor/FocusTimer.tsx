@@ -19,13 +19,13 @@ export function FocusTimer() {
     setIsActive(false);
     if (mode === 'focus') {
       try {
-        await updateXp.mutateAsync(20);
-        toast.success("Session Complete!", {
-          description: "You've earned +20 XP for this focus session.",
+        await updateXp.mutateAsync(25);
+        toast.success("Focus Session Complete!", {
+          description: "Stunning work! You've earned +25 XP.",
           icon: <Zap className="h-5 w-5 text-app-warning fill-app-warning" />
         });
       } catch (err) {
-        toast.error("Failed to save progress, but great job focusing!");
+        toast.error("Failed to sync progress, but your focus was logged.");
       }
     } else {
       toast.info("Break's over! Ready to focus again?");
@@ -57,8 +57,9 @@ export function FocusTimer() {
   };
   const toggleBreak = () => {
     setIsActive(false);
-    setMode(mode === 'focus' ? 'break' : 'focus');
-    const time = mode === 'focus' ? 5 * 60 : 25 * 60;
+    const isNextBreak = mode === 'focus';
+    setMode(isNextBreak ? 'break' : 'focus');
+    const time = isNextBreak ? 5 * 60 : 25 * 60;
     setTimeLeft(time);
     setInitialTime(time);
   };
@@ -124,7 +125,7 @@ export function FocusTimer() {
           <Button
             variant="default"
             size="lg"
-            className={`h-20 w-20 rounded-full shadow-xl ${mode === 'focus' ? 'bg-primary shadow-primary/30' : 'bg-app-success shadow-app-success/30'}`}
+            className={`h-20 w-20 rounded-full shadow-xl transition-transform hover:scale-110 active:scale-95 ${mode === 'focus' ? 'bg-primary shadow-primary/30' : 'bg-app-success shadow-app-success/30'}`}
             onClick={() => setIsActive(!isActive)}
           >
             {isActive ? <Pause className="h-10 w-10 fill-current" /> : <Play className="h-10 w-10 fill-current ml-1" />}

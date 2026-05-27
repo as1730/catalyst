@@ -40,10 +40,20 @@ export function userRoutes(app: Hono<{ Bindings: Env }>) {
   app.put('/api/tasks/:id', async (c) => {
     const id = c.req.param('id');
     const data = await c.req.json<Partial<Task>>();
-    const entity = new TaskEntity(c.env, id);
-    if (!(await entity.exists())) return notFound(c);
-    const updated = await entity.mutate(s => ({ ...s, ...data }));
-    return ok(c, updated);
+    const taskEntity = new TaskEntity(c.env, id);
+    if (!(await taskEntity.exists())) return notFound(c);
+    const oldTask = await taskEntity.getState();
+    const isNowCompleting = !oldTask.completed && data.completed === true;
+    const updatedTask = await taskEntity.mutate(s => ({ ...s, ...data }));
+    if (isNowCompleting) {
+      const user = new UserEntity(c.env, 'u1');
+      await user.mutate(s => {
+        const nextXp = (s.xp || 0) + (oldTask.xpReward || 20);
+        const level = Math.floor(nextXp / 1000) + 1;
+        return { ...s, xp: nextXp, level };
+      });
+    }
+    return ok(c, updatedTask);
   });
   app.delete('/api/tasks/:id', async (c) => ok(c, await TaskEntity.delete(c.env, c.req.param('id'))));
   // SUBJECTS
@@ -76,7 +86,7 @@ export function userRoutes(app: Hono<{ Bindings: Env }>) {
     return ok(c, updated);
   });
   app.delete('/api/subjects/:id', async (c) => ok(c, await SubjectEntity.delete(c.env, c.req.param('id'))));
-  // SESSIONS (omitted rest for brevity, same pattern)
+  // SESSIONS
   app.get('/api/sessions', async (c) => {
     await StudySessionEntity.ensureSeed(c.env);
     return ok(c, await StudySessionEntity.list(c.env));

@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Flame, Star, Zap, Clock, Calendar, Sparkles, BrainCircuit } from 'lucide-react';
-import { useSubjects, useUser, useTasks, useUpdateTask, useUpdateXp } from '@/hooks/use-data-hooks';
+import { useSubjects, useUser, useTasks, useUpdateTask } from '@/hooks/use-data-hooks';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -13,14 +13,15 @@ export function DashboardPage() {
   const { data: subjects } = useSubjects();
   const { data: tasksData, isLoading: loadingTasks } = useTasks();
   const updateTask = useUpdateTask();
-  const updateXp = useUpdateXp();
   const tasks = tasksData?.items ?? [];
   const handleToggleTask = async (id: string, currentlyCompleted: boolean, xp: number) => {
-    if (currentlyCompleted) return; // Prevent unchecking for demo simplicity
+    if (currentlyCompleted) return;
     try {
       await updateTask.mutateAsync({ id, data: { completed: true } });
-      await updateXp.mutateAsync(xp);
-      toast.success(`+${xp} XP Earned!`, { icon: <Zap className="h-4 w-4 text-app-warning" /> });
+      toast.success(`Task Complete: +${xp} XP`, { 
+        icon: <Zap className="h-4 w-4 text-app-warning" />,
+        description: "Your level progress has been updated."
+      });
     } catch (e) {
       toast.error("Failed to update task progress");
     }
