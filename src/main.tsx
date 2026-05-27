@@ -17,6 +17,7 @@ import { SubjectDetailPage } from '@/pages/SubjectDetailPage'
 import { SessionsPage } from '@/pages/SessionsPage'
 import { GoalsPage } from '@/pages/GoalsPage'
 import { AnalyticsPage } from '@/pages/AnalyticsPage'
+import { CalendarPage } from '@/pages/CalendarPage'
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -44,6 +45,11 @@ const router = createBrowserRouter([
   {
     path: "/sessions",
     element: <SessionsPage />,
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: "/calendar",
+    element: <CalendarPage />,
     errorElement: <RouteErrorBoundary />,
   },
   {

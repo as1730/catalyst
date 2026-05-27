@@ -12,7 +12,7 @@ const formSchema = z.object({
   title: z.string().min(2, "Title is required"),
   subjectId: z.string().min(1, "Subject is required"),
   startTime: z.string().min(1, "Start time is required"),
-  durationMinutes: z.coerce.number().min(5, "Minimum 5 minutes"),
+  durationMinutes: z.preprocess((val) => Number(val), z.number().min(5, "Minimum 5 minutes")),
 });
 type SessionFormValues = z.infer<typeof formSchema>;
 interface SessionFormProps {
@@ -23,11 +23,11 @@ export function SessionForm({ onSuccess }: SessionFormProps) {
   const createSession = useCreateSession();
   const form = useForm<SessionFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: { 
-      title: "", 
-      subjectId: "", 
-      startTime: "", 
-      durationMinutes: 60 
+    defaultValues: {
+      title: "",
+      subjectId: "",
+      startTime: "",
+      durationMinutes: 60
     },
   });
   const onSubmit: SubmitHandler<SessionFormValues> = async (values) => {
@@ -68,7 +68,7 @@ export function SessionForm({ onSuccess }: SessionFormProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Subject</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Which subject?" />

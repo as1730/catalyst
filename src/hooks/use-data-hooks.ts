@@ -1,6 +1,22 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api-client';
-import type { Subject, StudySession, Goal } from '@shared/types';
+import type { Subject, StudySession, Goal, User } from '@shared/types';
+export function useUser() {
+  return useQuery({
+    queryKey: ['user'],
+    queryFn: () => api<User>('/api/user/me'),
+  });
+}
+export function useUpdateXp() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (xp: number) => api<User>('/api/user/xp', {
+      method: 'POST',
+      body: JSON.stringify({ xp }),
+    }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['user'] }),
+  });
+}
 export function useSubjects() {
   return useQuery({
     queryKey: ['subjects'],
@@ -61,7 +77,7 @@ export function useUpdateSession() {
     }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sessions'] });
-      queryClient.invalidateQueries({ queryKey: ['goals'] }); // Sessions affect goal progress indirectly
+      queryClient.invalidateQueries({ queryKey: ['goals'] });
     },
   });
 }

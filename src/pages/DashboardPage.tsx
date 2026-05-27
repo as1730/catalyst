@@ -3,7 +3,7 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Flame, Star, Zap, Clock, Calendar, ArrowRight, Sparkles } from 'lucide-react';
+import { Flame, Star, Zap, Clock, Calendar, ArrowRight, Sparkles, BrainCircuit } from 'lucide-react';
 import { useSubjects, useGoals } from '@/hooks/use-data-hooks';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
@@ -62,14 +62,14 @@ export function DashboardPage() {
             </CardHeader>
             <CardContent className="space-y-2 px-6 pb-8">
               {tasks.map((task) => (
-                <div 
-                  key={task.id} 
+                <div
+                  key={task.id}
                   className={`flex items-center justify-between p-4 rounded-xl border transition-all ${task.completed ? 'bg-muted/30 border-transparent opacity-60' : 'bg-background hover:border-primary/50 border-border'}`}
                 >
                   <div className="flex items-center gap-4">
-                    <Checkbox 
-                      checked={task.completed} 
-                      onCheckedChange={() => toggleTask(task.id)} 
+                    <Checkbox
+                      checked={task.completed}
+                      onCheckedChange={() => toggleTask(task.id)}
                       className="h-5 w-5 rounded-md"
                     />
                     <span className={`font-semibold ${task.completed ? 'line-through' : ''}`}>{task.title}</span>
@@ -135,21 +135,21 @@ export function DashboardPage() {
             <Button variant="link" className="text-primary font-bold">View All</Button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {subjects?.items?.slice(0, 3).map((sub, i) => (
+            {subjects?.items?.slice(0, 3).map((sub) => (
               <Card key={sub.id} className="group hover:shadow-lg transition-all border-border/80">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-4xl">📚</span>
+                    <span className="text-4xl">{sub.emoji || '📚'}</span>
                     <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
-                      Lvl 5
+                      Lvl {sub.level || 1}
                     </div>
                   </div>
                   <h3 className="font-bold text-lg mb-1">{sub.name}</h3>
                   <div className="flex items-center gap-2 text-xs text-muted-foreground mb-4">
-                    <Calendar className="h-3.5 w-3.5" /> Exam in 14 days
+                    <Calendar className="h-3.5 w-3.5" /> {sub.examDate ? `Exam on ${new Date(sub.examDate).toLocaleDateString()}` : 'No exam set'}
                   </div>
                   <div className="w-full h-1.5 bg-secondary rounded-full overflow-hidden">
-                    <div className="h-full bg-primary" style={{ width: '65%' }} />
+                    <div className="h-full bg-primary" style={{ width: `${Math.min(100, (sub.xp / 1000) * 100)}%` }} />
                   </div>
                 </CardContent>
               </Card>
