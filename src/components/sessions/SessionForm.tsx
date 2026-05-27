@@ -15,23 +15,34 @@ const formSchema = z.object({
   durationMinutes: z.coerce.number().min(5, "Minimum 5 minutes"),
 });
 type SessionFormValues = z.infer<typeof formSchema>;
-export function SessionForm({ onSuccess }: { onSuccess: () => void }) {
+interface SessionFormProps {
+  onSuccess: () => void;
+}
+export function SessionForm({ onSuccess }: SessionFormProps) {
   const { data: subjectsData } = useSubjects();
   const createSession = useCreateSession();
   const form = useForm<SessionFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: { title: "", subjectId: "", startTime: "", durationMinutes: 60 },
+    defaultValues: { 
+      title: "", 
+      subjectId: "", 
+      startTime: "", 
+      durationMinutes: 60 
+    },
   });
   const onSubmit: SubmitHandler<SessionFormValues> = async (values) => {
     try {
       const startTime = new Date(values.startTime).getTime();
       await createSession.mutateAsync({
-        ...values,
+        title: values.title,
+        subjectId: values.subjectId,
+        durationMinutes: values.durationMinutes,
         startTime,
         endTime: startTime + values.durationMinutes * 60000,
-        status: 'planned'
+        status: 'planned',
+        type: 'pomodoro'
       });
-      toast.success("Session scheduled!");
+      toast.success("Focus session scheduled!");
       onSuccess();
     } catch (err) {
       toast.error("Failed to schedule session");
@@ -45,8 +56,8 @@ export function SessionForm({ onSuccess }: { onSuccess: () => void }) {
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Session Title</FormLabel>
-              <FormControl><Input placeholder="e.g. Chapter 4 Review" {...field} /></FormControl>
+              <FormLabel>Goal for this session</FormLabel>
+              <FormControl><Input placeholder="e.g. Master Calculus Integration" {...field} /></FormControl>
               <FormMessage />
             </FormItem>
           )}
@@ -57,10 +68,10 @@ export function SessionForm({ onSuccess }: { onSuccess: () => void }) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Subject</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a subject" />
+                    <SelectValue placeholder="Which subject?" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -90,15 +101,15 @@ export function SessionForm({ onSuccess }: { onSuccess: () => void }) {
             name="durationMinutes"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Duration (min)</FormLabel>
+                <FormLabel>Focus Time (min)</FormLabel>
                 <FormControl><Input type="number" {...field} /></FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
         </div>
-        <Button type="submit" className="w-full" disabled={createSession.isPending}>
-          {createSession.isPending ? "Scheduling..." : "Schedule Session"}
+        <Button type="submit" className="w-full h-12 text-lg font-bold rounded-xl" disabled={createSession.isPending}>
+          {createSession.isPending ? "Scheduling..." : "Plan Session"}
         </Button>
       </form>
     </Form>

@@ -1,73 +1,60 @@
 import React from "react";
-import { LayoutDashboard, BookOpen, Calendar, Target, BarChart3, Settings, BrainCircuit } from "lucide-react";
+import { LayoutDashboard, BookOpen, Clock, Target, BarChart3, BrainCircuit, Calendar } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarGroupLabel,
-} from "@/components/ui/sidebar";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+  { name: 'Home', href: '/', icon: LayoutDashboard },
   { name: 'Subjects', href: '/subjects', icon: BookOpen },
-  { name: 'Study Sessions', href: '/sessions', icon: Calendar },
+  { name: 'Focus', href: '/sessions', icon: Clock },
+  { name: 'Calendar', href: '/calendar', icon: Calendar },
   { name: 'Goals', href: '/goals', icon: Target },
-  { name: 'Analytics', href: '/analytics', icon: BarChart3 },
+  { name: 'Stats', href: '/analytics', icon: BarChart3 },
 ];
 export function AppSidebar(): JSX.Element {
   const location = useLocation();
   return (
-    <Sidebar variant="sidebar" collapsible="icon">
-      <SidebarHeader className="h-16 flex items-center px-6 border-b border-sidebar-border">
-        <div className="flex items-center gap-3 overflow-hidden">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shrink-0">
-            <BrainCircuit className="size-5" />
+    <TooltipProvider delayDuration={0}>
+      <aside className="fixed inset-y-0 left-0 w-20 bg-card border-r border-border flex flex-col items-center py-6 z-50">
+        <div className="mb-10">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/20">
+            <BrainCircuit className="size-7" />
           </div>
-          <span className="text-lg font-bold tracking-tight whitespace-nowrap">CognitoFlow</span>
         </div>
-      </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Menu</SidebarGroupLabel>
-          <SidebarMenu>
-            {navigation.map((item) => (
-              <SidebarMenuItem key={item.name}>
-                <SidebarMenuButton 
-                  asChild 
-                  isActive={location.pathname === item.href}
-                  tooltip={item.name}
-                >
-                  <Link to={item.href} className="flex items-center gap-3">
-                    <item.icon className="size-5" />
-                    <span>{item.name}</span>
+        <nav className="flex-1 flex flex-col gap-4 w-full px-2">
+          {navigation.map((item) => {
+            const isActive = location.pathname === item.href;
+            return (
+              <Tooltip key={item.name}>
+                <TooltipTrigger asChild>
+                  <Link
+                    to={item.href}
+                    className={cn(
+                      "relative flex h-14 w-full items-center justify-center rounded-xl transition-all duration-200 group",
+                      isActive 
+                        ? "bg-primary text-primary-foreground shadow-md" 
+                        : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                    )}
+                  >
+                    <item.icon className={cn("size-6", isActive ? "scale-110" : "group-hover:scale-110 transition-transform")} />
+                    {isActive && (
+                      <div className="absolute left-0 w-1 h-6 bg-primary rounded-r-full -ml-2" />
+                    )}
                   </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </SidebarGroup>
-      </SidebarContent>
-      <SidebarFooter className="p-4 border-t border-sidebar-border">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <Link to="/settings" className="flex items-center gap-3">
-                <Settings className="size-5" />
-                <span>Settings</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-        <div className="mt-4 px-2 py-3 rounded-lg bg-secondary/50 text-[10px] text-muted-foreground text-center">
-          CognitoFlow v1.0.0-alpha
+                </TooltipTrigger>
+                <TooltipContent side="right" sideOffset={10}>
+                  {item.name}
+                </TooltipContent>
+              </Tooltip>
+            );
+          })}
+        </nav>
+        <div className="mt-auto pt-6 border-t border-border w-full flex justify-center">
+           <div className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center text-[10px] font-bold text-muted-foreground">
+             v1.2
+           </div>
         </div>
-      </SidebarFooter>
-    </Sidebar>
+      </aside>
+    </TooltipProvider>
   );
 }
