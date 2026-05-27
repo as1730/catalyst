@@ -5,8 +5,10 @@ import { SubjectForm } from '@/components/subjects/SubjectForm';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { useSubjects } from '@/hooks/use-data-hooks';
 export function SubjectsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { data, isLoading } = useSubjects();
   return (
     <AppLayout container>
       <div className="space-y-8 animate-fade-in">
@@ -32,7 +34,7 @@ export function SubjectsPage() {
             </DialogContent>
           </Dialog>
         </div>
-        <SubjectList />
+        <SubjectList subjects={data?.items ?? []} isLoading={isLoading} />
       </div>
     </AppLayout>
   );

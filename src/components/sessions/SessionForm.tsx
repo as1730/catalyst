@@ -1,5 +1,5 @@
 import React from 'react';
-import { useForm, SubmitHandler } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -12,42 +12,30 @@ const formSchema = z.object({
   title: z.string().min(2, "Title is required"),
   subjectId: z.string().min(1, "Subject is required"),
   startTime: z.string().min(1, "Start time is required"),
-  durationMinutes: z.number().min(5, "Minimum 5 minutes"),
+  durationMinutes: z.coerce.number().min(5, "Minimum 5 minutes"),
 });
-type SessionFormValues = z.infer<typeof formSchema>;
-interface SessionFormProps {
-  onSuccess: () => void;
-}
-export function SessionForm({ onSuccess }: SessionFormProps) {
+export function SessionForm({ onSuccess }: { onSuccess: () => void }) {
   const { data: subjectsData } = useSubjects();
   const createSession = useCreateSession();
-  const form = useForm<SessionFormValues>({
+  const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      title: "",
-      subjectId: "",
-      startTime: "",
-      durationMinutes: 60
-    },
+    defaultValues: { title: "", subjectId: "", startTime: "", durationMinutes: 60 },
   });
-  const onSubmit: SubmitHandler<SessionFormValues> = async (values) => {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       const startTime = new Date(values.startTime).getTime();
       await createSession.mutateAsync({
-        title: values.title,
-        subjectId: values.subjectId,
-        durationMinutes: values.durationMinutes,
+        ...values,
         startTime,
         endTime: startTime + values.durationMinutes * 60000,
-        status: 'planned',
-        type: 'pomodoro'
+        status: 'planned'
       });
-      toast.success("Focus session scheduled!");
+      toast.success("Session scheduled!");
       onSuccess();
     } catch (err) {
       toast.error("Failed to schedule session");
     }
-  };
+  }
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
@@ -56,8 +44,8 @@ export function SessionForm({ onSuccess }: SessionFormProps) {
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Goal for this session</FormLabel>
-              <FormControl><Input placeholder="e.g. Master Calculus Integration" {...field} /></FormControl>
+              <FormLabel>Session Title</FormLabel>
+              <FormControl><Input placeholder="e.g. Chapter 4 Review" {...field} /></FormControl>
               <FormMessage />
             </FormItem>
           )}
@@ -71,7 +59,7 @@ export function SessionForm({ onSuccess }: SessionFormProps) {
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Which subject?" />
+                    <SelectValue placeholder="Select a subject" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -101,21 +89,15 @@ export function SessionForm({ onSuccess }: SessionFormProps) {
             name="durationMinutes"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Focus Time (min)</FormLabel>
-                <FormControl>
-                  <Input 
-                    type="number" 
-                    {...field} 
-                    onChange={(e) => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
-                  />
-                </FormControl>
+                <FormLabel>Duration (min)</FormLabel>
+                <FormControl><Input type="number" {...field} /></FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
         </div>
-        <Button type="submit" className="w-full h-12 text-lg font-bold rounded-xl" disabled={createSession.isPending}>
-          {createSession.isPending ? "Scheduling..." : "Plan Session"}
+        <Button type="submit" className="w-full" disabled={createSession.isPending}>
+          {createSession.isPending ? "Scheduling..." : "Schedule Session"}
         </Button>
       </form>
     </Form>

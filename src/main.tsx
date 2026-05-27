@@ -13,7 +13,15 @@ import { RouteErrorBoundary } from '@/components/RouteErrorBoundary';
 import '@/index.css'
 import { DashboardPage } from '@/pages/DashboardPage'
 import { SubjectsPage } from '@/pages/SubjectsPage'
-const queryClient = new QueryClient();
+import { SessionsPage } from '@/pages/SessionsPage'
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60,
+      retry: 1,
+    },
+  },
+});
 const router = createBrowserRouter([
   {
     path: "/",
@@ -27,7 +35,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/sessions",
-    element: <DashboardPage />, // Placeholder for Phase 2
+    element: <SessionsPage />,
     errorElement: <RouteErrorBoundary />,
   },
   {
