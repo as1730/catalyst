@@ -78,7 +78,8 @@ function updateWranglerJsonc() {
 
 function runSetupCommands() {
     const commands = [
-    "bun add react-intersection-observer@^9.13.0"
+    "bun add react-intersection-observer@^9.13.0",
+    "bun add lucide-react@latest"
 ];
     
     if (commands.length === 0) {
