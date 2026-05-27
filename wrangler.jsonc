@@ -4,7 +4,7 @@
  */
  {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "vite-cf-do-runner",
+	"name": "cognitoflow-study-ap-ya9r9febfkj49nec4tqe4",
 	"main": "worker/index.ts",
 	"compatibility_date": "2025-04-24",
 	"assets": {
