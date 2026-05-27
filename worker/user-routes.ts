@@ -1,13 +1,13 @@
 import { Hono } from "hono";
 import type { Env } from './core-utils';
-import { SubjectEntity, StudySessionEntity, GoalEntity, UserEntity } from "./entities";
+import { SubjectEntity, StudySessionEntity, GoalEntity, UserEntity, TaskEntity } from "./entities";
 import { ok, bad, notFound, isStr } from './core-utils';
-import type { Subject, StudySession, Goal } from "@shared/types";
+import type { Subject, StudySession, Goal, Task } from "@shared/types";
 export function userRoutes(app: Hono<{ Bindings: Env }>) {
   // USER STATS
   app.get('/api/user/me', async (c) => {
     await UserEntity.ensureSeed(c.env);
-    const user = new UserEntity(c.env, 'u1'); // Standard demo user
+    const user = new UserEntity(c.env, 'u1');
     return ok(c, await user.getState());
   });
   app.post('/api/user/xp', async (c) => {
@@ -20,6 +20,32 @@ export function userRoutes(app: Hono<{ Bindings: Env }>) {
     });
     return ok(c, state);
   });
+  // TASKS
+  app.get('/api/tasks', async (c) => {
+    await TaskEntity.ensureSeed(c.env);
+    return ok(c, await TaskEntity.list(c.env));
+  });
+  app.post('/api/tasks', async (c) => {
+    const data = await c.req.json<Partial<Task>>();
+    if (!isStr(data.title)) return bad(c, 'title required');
+    const task: Task = {
+      id: crypto.randomUUID(),
+      title: data.title,
+      completed: false,
+      xpReward: data.xpReward || 20,
+      subjectId: data.subjectId
+    };
+    return ok(c, await TaskEntity.create(c.env, task));
+  });
+  app.put('/api/tasks/:id', async (c) => {
+    const id = c.req.param('id');
+    const data = await c.req.json<Partial<Task>>();
+    const entity = new TaskEntity(c.env, id);
+    if (!(await entity.exists())) return notFound(c);
+    const updated = await entity.mutate(s => ({ ...s, ...data }));
+    return ok(c, updated);
+  });
+  app.delete('/api/tasks/:id', async (c) => ok(c, await TaskEntity.delete(c.env, c.req.param('id'))));
   // SUBJECTS
   app.get('/api/subjects', async (c) => {
     await SubjectEntity.ensureSeed(c.env);
@@ -50,7 +76,7 @@ export function userRoutes(app: Hono<{ Bindings: Env }>) {
     return ok(c, updated);
   });
   app.delete('/api/subjects/:id', async (c) => ok(c, await SubjectEntity.delete(c.env, c.req.param('id'))));
-  // SESSIONS
+  // SESSIONS (omitted rest for brevity, same pattern)
   app.get('/api/sessions', async (c) => {
     await StudySessionEntity.ensureSeed(c.env);
     return ok(c, await StudySessionEntity.list(c.env));

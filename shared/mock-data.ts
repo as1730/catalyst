@@ -1,39 +1,39 @@
-import type { Subject, StudySession, Goal, User } from './types';
+import type { Subject, StudySession, Goal, User, Task } from './types';
 export const MOCK_USERS: User[] = [
-  { 
-    id: 'u1', 
-    name: 'Alex Catalyst', 
-    xp: 450, 
-    level: 12, 
-    streak: 12, 
-    lastActiveDate: Date.now() 
+  {
+    id: 'u1',
+    name: 'Alex Catalyst',
+    xp: 450,
+    level: 12,
+    streak: 12,
+    lastActiveDate: Date.now()
   }
 ];
 export const MOCK_SUBJECTS: Subject[] = [
-  { 
-    id: 's1', 
-    name: 'Advanced Mathematics', 
-    description: 'Calculus, Linear Algebra, and Differential Equations', 
+  {
+    id: 's1',
+    name: 'Advanced Mathematics',
+    description: 'Calculus, Linear Algebra, and Differential Equations',
     createdAt: Date.now() - 10000000,
     emoji: '📐',
     confidence: 3,
     level: 5,
     xp: 1200
   },
-  { 
-    id: 's2', 
-    name: 'World History', 
-    description: 'Analysis of major global events from 1500 to present', 
+  {
+    id: 's2',
+    name: 'World History',
+    description: 'Analysis of major global events from 1500 to present',
     createdAt: Date.now() - 8000000,
     emoji: '🌍',
     confidence: 4,
     level: 3,
     xp: 800
   },
-  { 
-    id: 's3', 
-    name: 'Cognitive Psychology', 
-    description: 'Study of mental processes like perception and memory', 
+  {
+    id: 's3',
+    name: 'Cognitive Psychology',
+    description: 'Study of mental processes like perception and memory',
     createdAt: Date.now() - 5000000,
     emoji: '🧠',
     confidence: 2,
@@ -81,4 +81,9 @@ export const MOCK_GOALS: Goal[] = [
     status: 'active',
     relatedSubjects: ['s2']
   }
+];
+export const MOCK_TASKS: Task[] = [
+  { id: 't1', title: 'Complete Calculus Assignment', completed: false, xpReward: 50, subjectId: 's1' },
+  { id: 't2', title: 'Read Chapter 5 History', completed: false, xpReward: 30, subjectId: 's2' },
+  { id: 't3', title: 'Daily Review: Cognitive Models', completed: true, xpReward: 20, subjectId: 's3' }
 ];

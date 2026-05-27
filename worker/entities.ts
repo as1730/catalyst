@@ -1,30 +1,30 @@
 import { IndexedEntity } from "./core-utils";
-import type { Subject, StudySession, Goal, User } from "@shared/types";
-import { MOCK_SUBJECTS, MOCK_STUDY_SESSIONS, MOCK_GOALS, MOCK_USERS } from "@shared/mock-data";
+import type { Subject, StudySession, Goal, User, Task } from "@shared/types";
+import { MOCK_SUBJECTS, MOCK_STUDY_SESSIONS, MOCK_GOALS, MOCK_USERS, MOCK_TASKS } from "@shared/mock-data";
 export class UserEntity extends IndexedEntity<User> {
   static readonly entityName = "user";
   static readonly indexName = "users";
-  static readonly initialState: User = { 
-    id: "", 
-    name: "", 
-    xp: 0, 
-    level: 1, 
-    streak: 0, 
-    lastActiveDate: 0 
+  static readonly initialState: User = {
+    id: "",
+    name: "",
+    xp: 0,
+    level: 1,
+    streak: 0,
+    lastActiveDate: 0
   };
   static seedData = MOCK_USERS;
 }
 export class SubjectEntity extends IndexedEntity<Subject> {
   static readonly entityName = "subject";
   static readonly indexName = "subjects";
-  static readonly initialState: Subject = { 
-    id: "", 
-    name: "", 
-    createdAt: 0, 
-    emoji: "📚", 
-    confidence: 3, 
-    level: 1, 
-    xp: 0 
+  static readonly initialState: Subject = {
+    id: "",
+    name: "",
+    createdAt: 0,
+    emoji: "📚",
+    confidence: 3,
+    level: 1,
+    xp: 0
   };
   static seedData = MOCK_SUBJECTS;
 }
@@ -55,4 +55,15 @@ export class GoalEntity extends IndexedEntity<Goal> {
     relatedSubjects: []
   };
   static seedData = MOCK_GOALS;
+}
+export class TaskEntity extends IndexedEntity<Task> {
+  static readonly entityName = "task";
+  static readonly indexName = "tasks";
+  static readonly initialState: Task = {
+    id: "",
+    title: "",
+    completed: false,
+    xpReward: 20
+  };
+  static seedData = MOCK_TASKS;
 }

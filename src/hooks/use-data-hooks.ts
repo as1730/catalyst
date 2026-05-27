@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api-client';
-import type { Subject, StudySession, Goal, User } from '@shared/types';
+import type { Subject, StudySession, Goal, User, Task } from '@shared/types';
 export function useUser() {
   return useQuery({
     queryKey: ['user'],
@@ -15,6 +15,41 @@ export function useUpdateXp() {
       body: JSON.stringify({ xp }),
     }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['user'] }),
+  });
+}
+export function useTasks() {
+  return useQuery({
+    queryKey: ['tasks'],
+    queryFn: () => api<{ items: Task[] }>('/api/tasks'),
+  });
+}
+export function useCreateTask() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: Partial<Task>) => api<Task>('/api/tasks', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tasks'] }),
+  });
+}
+export function useUpdateTask() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<Task> }) => api<Task>(`/api/tasks/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tasks'] }),
+  });
+}
+export function useDeleteTask() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api<boolean>(`/api/tasks/${id}`, {
+      method: 'DELETE',
+    }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tasks'] }),
   });
 }
 export function useSubjects() {
