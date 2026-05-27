@@ -1,6 +1,6 @@
 # Cloudflare Workers React Starter
 
-[cloudflarebutton]
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/as1730/catalyst)
 
 A modern full-stack application template built with React, Vite, and Cloudflare Workers. Features type-safe TypeScript, Durable Objects for persistent state, Hono for API routing, and a polished shadcn/ui frontend.
 
@@ -100,7 +100,7 @@ Deploy to Cloudflare Workers with a single command:
 bun run deploy
 ```
 
-[cloudflarebutton]
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/as1730/catalyst)
 
 The deployment uses Wrangler and the `wrangler.jsonc` configuration. Durable Object migrations are automatically handled.
 
